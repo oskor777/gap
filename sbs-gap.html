@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBS — Gap Boshqaruv Tizimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-l:#F0C76A;--gold-d:#9A7A2E;--em:#0A2519;--em-mid:#0F3A26;--em-light:#165233;--em-card:#122D1F;--cream:#F5EDD6;--muted:#8BAF96;--red:#E85454;--green:#4FC36A;--blue:#5B9BD5;--border:rgba(201,168,76,.22);--border-s:rgba(201,168,76,.45);--r:14px;--r-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--em);color:var(--cream);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(201,168,76,.012) 40px,rgba(201,168,76,.012) 41px),radial-gradient(ellipse at 15% 20%,rgba(201,168,76,.05) 0%,transparent 50%),radial-gradient(ellipse at 85% 80%,rgba(22,82,51,.6) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:rgba(10,37,25,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-s);}
+.h-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:66px;}
+.logo{font-family:'Cinzel',serif;font-size:28px;font-weight:700;color:var(--gold);letter-spacing:5px;display:flex;align-items:center;gap:10px;}
+.logo-wrap span{display:block;font-family:'Nunito',sans-serif;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:-2px;}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);animation:pulse 2.2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.5)}50%{box-shadow:0 0 0 6px rgba(201,168,76,0)}}
+.h-right{display:flex;align-items:center;gap:12px;}
+.day-badge{background:var(--em-mid);border:1px solid var(--border-s);border-radius:20px;padding:7px 16px;font-size:13px;color:var(--gold-l);display:flex;align-items:center;gap:8px;cursor:pointer;transition:.2s;}
+.day-badge:hover{background:var(--em-light);}
+.day-badge small{color:var(--muted);font-size:11px;}
+.countdown{background:linear-gradient(135deg,var(--gold-d),var(--gold));color:var(--em);border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;}
+
+/* NAV */
+nav{background:var(--em-mid);border-bottom:1px solid var(--border);position:sticky;top:66px;z-index:199;}
+.nav-inner{max-width:1120px;margin:0 auto;display:flex;padding:0 24px;gap:2px;}
+.tab{padding:13px 22px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px;}
+.tab:hover{color:var(--cream);}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.n-badge{background:var(--gold);color:var(--em);border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;}
+.n-badge.red{background:var(--red);color:#fff;}
+
+/* MAIN */
+main{max-width:1120px;margin:0 auto;padding:28px 24px 80px;position:relative;z-index:1;}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.on{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:28px;}
+.stat{background:var(--em-card);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l));}
+.stat-lbl{font-size:11px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;}
+.stat-val{font-family:'Cinzel',serif;font-size:30px;font-weight:600;color:var(--gold-l);line-height:1;}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+.stat-ico{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.1;}
+
+/* SECTION */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.sec-title{font-family:'Cinzel',serif;font-size:17px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';width:3px;height:18px;background:linear-gradient(to bottom,var(--gold),var(--gold-d));border-radius:2px;}
+
+/* BUTTONS */
+.btn{padding:10px 22px;border-radius:var(--r-sm);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:.2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-g{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--em);}
+.btn-g:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(201,168,76,.4);}
+.btn-o{background:var(--em-mid);color:var(--gold);border:1px solid var(--border-s);}
+.btn-o:hover{background:var(--em-light);}
+.btn-r{background:rgba(232,84,84,.12);color:var(--red);border:1px solid rgba(232,84,84,.3);}
+.btn-r:hover{background:rgba(232,84,84,.22);}
+.btn-sm{padding:6px 14px;font-size:12px;}
+.btn-icon{width:34px;height:34px;padding:0;justify-content:center;align-items:center;border-radius:var(--r-sm);}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;min-width:600px;}
+thead{background:var(--em-mid);}
+th{padding:13px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+td{padding:14px 16px;font-size:14px;border-bottom:1px solid rgba(201,168,76,.08);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(201,168,76,.04);}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--em);flex-shrink:0;}
+.member-info{display:flex;align-items:center;gap:12px;}
+.member-name{font-weight:600;font-size:14px;}
+.member-phone{font-size:12px;color:var(--muted);}
+
+/* STATUS BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.badge-g{background:rgba(79,195,106,.15);color:#4FC36A;border:1px solid rgba(79,195,106,.3);}
+.badge-r{background:rgba(232,84,84,.12);color:var(--red);border:1px solid rgba(232,84,84,.3);}
+.badge-y{background:rgba(240,199,106,.12);color:var(--gold-l);border:1px solid rgba(240,199,106,.3);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;}
+.modal-bg.on{display:flex;}
+.modal{background:var(--em-card);border:1px solid var(--border-s);border-radius:var(--r);padding:32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:popIn .25s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-family:'Cinzel',serif;font-size:20px;font-weight:600;color:var(--gold);margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+.modal-close{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;padding:0 4px;}
+.modal-close:hover{color:var(--cream);}
+
+/* FORM */
+.form-row{margin-bottom:18px;}
+.form-row label{display:block;font-size:12px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px;font-weight:600;}
+.form-row input,.form-row select{width:100%;background:var(--em-mid);border:1px solid var(--border-s);border-radius:var(--r-sm);padding:11px 14px;color:var(--cream);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:.2s;}
+.form-row input:focus,.form-row select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+.form-row input::placeholder{color:var(--muted);}
+.form-row select option{background:var(--em-mid);color:var(--cream);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-actions{display:flex;gap:12px;margin-top:24px;}
+.form-actions .btn{flex:1;justify-content:center;}
+
+/* PAYMENT GRID */
+.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.pay-card{background:var(--em-card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.pay-card-head{padding:16px 20px;background:var(--em-mid);display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.pay-card-body{padding:16px 20px;}
+.pay-month-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.07);}
+.pay-month-row:last-child{border-bottom:none;}
+.pay-toggle{width:48px;height:26px;border-radius:13px;border:none;cursor:pointer;transition:.3s;position:relative;flex-shrink:0;}
+.pay-toggle.paid{background:rgba(79,195,106,.3);}
+.pay-toggle.unpaid{background:rgba(201,168,76,.15);}
+.pay-toggle::after{content:'';width:20px;height:20px;border-radius:50%;position:absolute;top:3px;transition:.3s;}
+.pay-toggle.paid::after{background:var(--green);right:3px;}
+.pay-toggle.unpaid::after{background:var(--gold);left:3px;}
+
+/* SMS PAGE */
+.sms-card{background:var(--em-card);border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-bottom:20px;}
+.sms-preview{background:var(--em-mid);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;font-size:13px;line-height:1.7;color:var(--cream);margin:16px 0;white-space:pre-wrap;}
+.sms-member-list{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.sms-member-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--em-mid);border:1px solid var(--border);border-radius:var(--r-sm);}
+.sms-member-item .chk{width:20px;height:20px;border-radius:4px;border:2px solid var(--border-s);background:transparent;cursor:pointer;flex-shrink:0;appearance:none;transition:.2s;}
+.sms-member-item .chk:checked{background:var(--gold);border-color:var(--gold);}
+.sms-member-item .chk:checked::after{content:'✓';color:var(--em);font-size:13px;font-weight:700;display:flex;justify-content:center;align-items:center;line-height:1;}
+.sms-sent{display:none;flex-direction:column;align-items:center;gap:12px;padding:32px;text-align:center;}
+.sms-sent.on{display:flex;}
+.sms-sent-icon{width:72px;height:72px;border-radius:50%;background:rgba(79,195,106,.15);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;animation:bounceIn .5s ease;}
+@keyframes bounceIn{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.setting-card{background:var(--em-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;}
+.setting-title{font-size:14px;font-weight:700;color:var(--gold-l);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;display:flex;flex-direction:column;gap:8px;}
+.toast-item{background:var(--em-mid);border:1px solid var(--border-s);border-radius:var(--r-sm);padding:14px 20px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:260px;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-item.success{border-left:3px solid var(--green);color:var(--green);}
+.toast-item.error{border-left:3px solid var(--red);color:var(--red);}
+.toast-item.info{border-left:3px solid var(--gold);color:var(--gold);}
+
+/* LOADER */
+.loader{display:flex;align-items:center;justify-content:center;gap:8px;padding:40px;color:var(--muted);font-size:14px;}
+.spin{width:20px;height:20px;border:2px solid var(--border-s);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 20px;color:var(--muted);}
+.empty-icon{font-size:52px;opacity:.3;margin-bottom:12px;}
+.empty p{font-size:15px;}
+
+/* DEBT */
+.debt-val{color:var(--red);font-weight:700;}
+.debt-val.ok{color:var(--green);}
+
+/* MONTH PICKER */
+.month-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.month-nav button{background:var(--em-mid);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 16px;color:var(--cream);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;font-size:13px;transition:.2s;}
+.month-nav button:hover{border-color:var(--gold);color:var(--gold);}
+.month-label{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);font-weight:600;}
+
+/* PROGRESS BAR */
+.prog-wrap{background:rgba(201,168,76,.1);border-radius:4px;height:6px;margin-top:10px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold-l));border-radius:4px;transition:.5s;}
+
+/* ORNAMENT */
+.ornament{text-align:center;color:var(--gold-d);font-size:18px;letter-spacing:8px;margin:8px 0;opacity:.5;}
+
+@media(max-width:600px){
+  .h-inner{padding:0 16px;}.form-grid{grid-template-columns:1fr;}
+  main{padding:16px 12px 60px;}.stat-val{font-size:22px;}
+  .tab{padding:10px 14px;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-inner">
+    <div class="logo-wrap">
+      <div class="logo">
+        <div class="logo-dot"></div>
+        SBS
+      </div>
+      <span>Gap Boshqaruv Tizimi</span>
+    </div>
+    <div class="h-right">
+      <div class="day-badge" onclick="openSettings()">
+        <small>Gap kuni:</small>
+        <strong id="hdr-day">—</strong>
+        har oy
+      </div>
+      <div class="countdown" id="hdr-countdown">— kun</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <button class="tab on" onclick="showTab('dashboard')">📊 Dashboard</button>
+    <button class="tab" onclick="showTab('members')">👥 A'zolar <span class="n-badge" id="n-members">0</span></button>
+    <button class="tab" onclick="showTab('payments')">💰 To'lovlar</button>
+    <button class="tab" onclick="showTab('sms')">📱 SMS</button>
+    <button class="tab" onclick="showTab('settings')">⚙️ Sozlamalar</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div class="page on" id="pg-dashboard">
+  <div class="stat-grid" id="stat-grid">
+    <div class="stat"><div class="stat-lbl">Jami a'zolar</div><div class="stat-val" id="s-total">—</div><div class="stat-sub">Gap ishtirokchilari</div><div class="stat-ico">👥</div></div>
+    <div class="stat"><div class="stat-lbl">To'lagan</div><div class="stat-val" id="s-paid" style="color:var(--green)">—</div><div class="stat-sub" id="s-paid-sub">bu oy</div><div class="stat-ico">✅</div></div>
+    <div class="stat"><div class="stat-lbl">To'lamagan</div><div class="stat-val" id="s-unpaid" style="color:var(--red)">—</div><div class="stat-sub" id="s-unpaid-sub">bu oy</div><div class="stat-ico">⏳</div></div>
+    <div class="stat"><div class="stat-lbl">Jami yig'ilgan</div><div class="stat-val" id="s-amount">—</div><div class="stat-sub">bu oy (so'm)</div><div class="stat-ico">💰</div></div>
+  </div>
+
+  <div class="prog-wrap" style="margin-bottom:28px;height:8px;">
+    <div class="prog-bar" id="prog-bar" style="width:0%"></div>
+  </div>
+
+  <div class="sec-hd">
+    <div class="sec-title">Bu oygi holat</div>
+    <span id="dash-month" style="color:var(--muted);font-size:13px;"></span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>A'zo</th><th>Telefon</th><th>Holat</th><th>Qarz</th></tr></thead>
+      <tbody id="dash-tbody">
+        <tr><td colspan="5"><div class="loader"><div class="spin"></div>Yuklanmoqda...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div class="page" id="pg-members">
+  <div class="sec-hd">
+    <div class="sec-title">A'zolar ro'yxati</div>
+    <button class="btn btn-g" onclick="openAddMember()">➕ A'zo qo'shish</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Ism</th><th>Familiya</th><th>Telefon</th><th>Qarz</th><th>Amallar</th></tr></thead>
+      <tbody id="members-tbody">
+        <tr><td colspan="6"><div class="loader"><div class="spin"></div>Yuklanmoqda...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAYMENTS -->
+<div class="page" id="pg-payments">
+  <div class="month-nav">
+    <button onclick="changeMonth(-1)">◀ Avvalgi</button>
+    <div class="month-label" id="pay-month-label">—</div>
+    <button onclick="changeMonth(1)">Keyingi ▶</button>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn btn-g btn-sm" onclick="markAllPaid()">✅ Hammasini to'landi deb belgilash</button>
+    </div>
+  </div>
+  <div class="pay-grid" id="pay-grid">
+    <div class="loader"><div class="spin"></div>Yuklanmoqda...</div>
+  </div>
+</div>
+
+<!-- SMS -->
+<div class="page" id="pg-sms">
+  <div class="sms-card">
+    <div class="sec-title" style="margin-bottom:18px;">📱 SMS Yuborish</div>
+    <div class="ornament">✦ ✦ ✦</div>
+
+    <div class="form-row" style="margin-top:16px;">
+      <label>SMS Matni</label>
+      <textarea id="sms-text" rows="4" style="width:100%;background:var(--em-mid);border:1px solid var(--border-s);border-radius:var(--r-sm);padding:12px 14px;color:var(--cream);font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+    </div>
+
+    <div class="form-row">
+      <label>Shablonlar</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="btn btn-o btn-sm" onclick="setSmsTemplate('eslatma')">📅 Gap kuni eslatmasi</button>
+        <button class="btn btn-o btn-sm" onclick="setSmsTemplate('qarz')">⚠️ Qarz eslatmasi</button>
+        <button class="btn btn-o btn-sm" onclick="setSmsTemplate('yangi')">🎉 Yangi gap</button>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin:20px 0 14px;">A'zolarni tanlang</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-o btn-sm" onclick="selectAllSms(true)">Hammasini tanlash</button>
+      <button class="btn btn-o btn-sm" onclick="selectAllSms(false)">Bekor qilish</button>
+      <button class="btn btn-o btn-sm" onclick="selectUnpaidSms()">⚠️ Faqat to'lamaganlar</button>
+    </div>
+    <div class="sms-member-list" id="sms-member-list">
+      <div class="loader"><div class="spin"></div>Yuklanmoqda...</div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px;">
+      <button class="btn btn-g" style="flex:1;justify-content:center;" onclick="sendSms()">📤 SMS Yuborish</button>
+    </div>
+  </div>
+
+  <div id="sms-log" style="display:none;" class="sms-card">
+    <div class="sec-title" style="margin-bottom:16px;">📋 Yuborilgan SMS tarixi</div>
+    <div id="sms-log-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="pg-settings">
+  <div class="sec-title" style="margin-bottom:20px;">⚙️ Gap Sozlamalari</div>
+  <div class="settings-grid">
+    <div class="setting-card">
+      <div class="setting-title">📅 Gap sanasi</div>
+      <div class="form-row">
+        <label>Har oyning necha-si</label>
+        <input type="number" id="set-day" min="1" max="28" placeholder="Masalan: 15" />
+      </div>
+      <div class="form-row">
+        <label>Gap nomi</label>
+        <input type="text" id="set-name" placeholder="Masalan: Do'stlar gap" />
+      </div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-title">💰 Moliyaviy</div>
+      <div class="form-row">
+        <label>Gap summasi (so'm)</label>
+        <input type="number" id="set-amount" placeholder="Masalan: 500000" />
+      </div>
+      <div class="form-row">
+        <label>Jarima (kechikish uchun)</label>
+        <input type="number" id="set-fine" placeholder="Masalan: 10000" />
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px;">
+    <button class="btn btn-g" onclick="saveSettings()">💾 Saqlash</button>
+  </div>
+  <div style="margin-top:28px;" class="setting-card">
+    <div class="setting-title">🔗 API Ma'lumotlari</div>
+    <p style="font-size:13px;color:var(--muted);">MockAPI: <code style="color:var(--gold-l);font-size:12px;">https://69e4eb13cfa9394db8da878c.mockapi.io/demo/gap</code></p>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-o btn-sm" onclick="testApi()">🔍 API ni tekshirish</button>
+      <button class="btn btn-r btn-sm" onclick="clearAllData()">🗑️ Barcha ma'lumotni o'chirish</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MODALS -->
+<div class="modal-bg" id="modal-member">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-member-title">➕ A'zo qo'shish</span>
+      <button class="modal-close" onclick="closeModal('modal-member')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Ism *</label>
+        <input type="text" id="m-name" placeholder="Jasur" />
+      </div>
+      <div class="form-row">
+        <label>Familiya (ixtiyoriy)</label>
+        <input type="text" id="m-surname" placeholder="Karimov" />
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Telefon *</label>
+      <input type="tel" id="m-phone" placeholder="+998901234567" />
+    </div>
+    <div class="form-row">
+      <label>Qarz (so'm)</label>
+      <input type="number" id="m-debt" placeholder="0" value="0" />
+    </div>
+    <input type="hidden" id="m-id" />
+    <div class="form-actions">
+      <button class="btn btn-o" onclick="closeModal('modal-member')">Bekor</button>
+      <button class="btn btn-g" onclick="saveMember()">💾 Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-sms-result">
+  <div class="modal" style="text-align:center;">
+    <div class="sms-sent on">
+      <div class="sms-sent-icon">✓</div>
+      <div style="font-family:'Cinzel',serif;font-size:20px;color:var(--green);">SMS Yuborildi!</div>
+      <div id="sms-result-text" style="color:var(--muted);font-size:14px;"></div>
+      <div id="sms-numbers-list" style="text-align:left;width:100%;background:var(--em-mid);border-radius:var(--r-sm);padding:16px;margin-top:8px;font-size:13px;color:var(--cream);max-height:200px;overflow-y:auto;"></div>
+      <button class="btn btn-g" style="margin-top:8px;" onclick="closeModal('modal-sms-result')">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast-wrap"></div>
+
+<script>
+const API = 'https://69e4eb13cfa9394db8da878c.mockapi.io/demo/gap';
+let members = [];
+let settings = {};
+let currentPayMonth = new Date();
+let smsLog = [];
+
+/* ── SETTINGS ── */
+function loadSettings(){
+  const s = localStorage.getItem('sbs_settings');
+  settings = s ? JSON.parse(s) : {day:15,name:'Gap',amount:500000,fine:10000};
+  updateHeader();
+  if(document.getElementById('set-day')) applySettingsToForm();
+}
+function saveSettings(){
+  settings.day = parseInt(document.getElementById('set-day').value)||15;
+  settings.name = document.getElementById('set-name').value||'Gap';
+  settings.amount = parseInt(document.getElementById('set-amount').value)||500000;
+  settings.fine = parseInt(document.getElementById('set-fine').value)||10000;
+  localStorage.setItem('sbs_settings',JSON.stringify(settings));
+  updateHeader();
+  toast('Sozlamalar saqlandi ✅','success');
+}
+function applySettingsToForm(){
+  document.getElementById('set-day').value = settings.day||15;
+  document.getElementById('set-name').value = settings.name||'Gap';
+  document.getElementById('set-amount').value = settings.amount||500000;
+  document.getElementById('set-fine').value = settings.fine||10000;
+}
+function openSettings(){ showTab('settings'); }
+function updateHeader(){
+  document.getElementById('hdr-day').textContent = settings.day||'—';
+  const today = new Date();
+  const gapDate = new Date(today.getFullYear(), today.getMonth(), settings.day||15);
+  if(gapDate < today) gapDate.setMonth(gapDate.getMonth()+1);
+  const diff = Math.ceil((gapDate - today)/(1000*60*60*24));
+  const el = document.getElementById('hdr-countdown');
+  if(diff===0){ el.textContent='Bugun!'; el.style.background='var(--green)'; }
+  else if(diff<=3){ el.textContent=diff+' kun'; el.style.background='var(--red)'; }
+  else{ el.textContent=diff+' kun'; el.style.background=''; }
+}
+
+/* ── FETCH HELPERS ── */
+async function apiGet(){
+  const r = await fetch(API); if(!r.ok) throw new Error('Server xatosi'); return r.json();
+}
+async function apiPost(data){
+  const r = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if(!r.ok) throw new Error('Qo\'shishda xato'); return r.json();
+}
+async function apiPut(id,data){
+  const r = await fetch(API+'/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if(!r.ok) throw new Error('Yangilashda xato'); return r.json();
+}
+async function apiDelete(id){
+  const r = await fetch(API+'/'+id,{method:'DELETE'}); if(!r.ok) throw new Error('O\'chirishda xato'); return r.json();
+}
+
+/* ── LOAD MEMBERS ── */
+async function loadMembers(){
+  try{
+    members = await apiGet();
+    renderDashboard(); renderMembersTable(); renderPayGrid(); renderSmsMembers();
+    document.getElementById('n-members').textContent = members.length;
+  } catch(e){ toast('Ma\'lumot yuklanmadi: '+e.message,'error'); }
+}
+
+/* ── DASHBOARD ── */
+function renderDashboard(){
+  const mk = monthKey(currentPayMonth);
+  const total = members.length;
+  const paid = members.filter(m=>m.payments && m.payments[mk]).length;
+  const unpaid = total - paid;
+  const amount = paid * (settings.amount||500000);
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-paid').textContent = paid;
+  document.getElementById('s-unpaid').textContent = unpaid;
+  document.getElementById('s-amount').textContent = amount.toLocaleString('uz-UZ');
+  document.getElementById('dash-month').textContent = formatMonth(currentPayMonth);
+  const pct = total ? Math.round((paid/total)*100) : 0;
+  document.getElementById('prog-bar').style.width = pct+'%';
+  const tbody = document.getElementById('dash-tbody');
+  if(!total){ tbody.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">👥</div><p>Hali a\'zo yo\'q</p></div></td></tr>'; return; }
+  tbody.innerHTML = members.map((m,i)=>{
+    const isPaid = m.payments && m.payments[mk];
+    const debt = parseInt(m.debt)||0;
+    return `<tr>
+      <td style="color:var(--muted);font-size:13px;">${i+1}</td>
+      <td><div class="member-info">
+        <div class="avatar">${initials(m.name,m.surname)}</div>
+        <div><div class="member-name">${m.name} ${m.surname||''}</div></div>
+      </div></td>
+      <td style="color:var(--muted);font-size:13px;">${m.phone||'—'}</td>
+      <td>${isPaid?'<span class="badge badge-g">✓ To\'lagan</span>':'<span class="badge badge-r">✗ To\'lamagan</span>'}</td>
+      <td class="${debt>0?'debt-val':'debt-val ok'}">${debt>0?'−'+debt.toLocaleString('uz-UZ')+' so\'m':'0'}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── MEMBERS TABLE ── */
+function renderMembersTable(){
+  const tbody = document.getElementById('members-tbody');
+  if(!members.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">👥</div><p>A\'zo qo\'shish uchun "A\'zo qo\'shish" tugmasini bosing</p></div></td></tr>'; return; }
+  tbody.innerHTML = members.map((m,i)=>{
+    const debt = parseInt(m.debt)||0;
+    return `<tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td><div class="member-info">
+        <div class="avatar">${initials(m.name,m.surname)}</div>
+        <div><div class="member-name">${m.name}</div><div class="member-phone">${m.phone||''}</div></div>
+      </div></td>
+      <td>${m.surname||'<span style="color:var(--muted)">—</span>'}</td>
+      <td style="font-size:13px;">${m.phone||'—'}</td>
+      <td class="${debt>0?'debt-val':'debt-val ok'}">${debt>0?'−'+debt.toLocaleString('uz-UZ')+' so\'m':'Qarz yo\'q'}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-o btn-sm" onclick="editMember('${m.id}')">✏️</button>
+          <button class="btn btn-r btn-sm" onclick="deleteMember('${m.id}','${m.name}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── ADD / EDIT MEMBER ── */
+function openAddMember(){
+  document.getElementById('modal-member-title').textContent = '➕ A\'zo qo\'shish';
+  document.getElementById('m-id').value = '';
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-surname').value = '';
+  document.getElementById('m-phone').value = '';
+  document.getElementById('m-debt').value = '0';
+  openModal('modal-member');
+}
+function editMember(id){
+  const m = members.find(x=>x.id===id); if(!m) return;
+  document.getElementById('modal-member-title').textContent = '✏️ A\'zoni tahrirlash';
+  document.getElementById('m-id').value = id;
+  document.getElementById('m-name').value = m.name||'';
+  document.getElementById('m-surname').value = m.surname||'';
+  document.getElementById('m-phone').value = m.phone||'';
+  document.getElementById('m-debt').value = m.debt||0;
+  openModal('modal-member');
+}
+async function saveMember(){
+  const id = document.getElementById('m-id').value;
+  const name = document.getElementById('m-name').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  if(!name){ toast('Ism kiritilmadi!','error'); return; }
+  if(!phone){ toast('Telefon raqam kiritilmadi!','error'); return; }
+  const data = {
+    name, surname: document.getElementById('m-surname').value.trim(),
+    phone, debt: parseInt(document.getElementById('m-debt').value)||0,
+    payments: id ? (members.find(x=>x.id===id)||{}).payments||{} : {}
+  };
+  try{
+    if(id){ await apiPut(id,data); toast(name+' yangilandi ✅','success'); }
+    else{ await apiPost(data); toast(name+' qo\'shildi ✅','success'); }
+    closeModal('modal-member');
+    await loadMembers();
+  } catch(e){ toast(e.message,'error'); }
+}
+async function deleteMember(id,name){
+  if(!confirm(name+' ni o\'chirasizmi?')) return;
+  try{
+    await apiDelete(id); toast(name+' o\'chirildi','info'); await loadMembers();
+  } catch(e){ toast(e.message,'error'); }
+}
+
+/* ── PAYMENTS ── */
+function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function formatMonth(d){ const names=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr']; return names[d.getMonth()]+' '+d.getFullYear(); }
+function changeMonth(dir){ currentPayMonth = new Date(currentPayMonth.getFullYear(), currentPayMonth.getMonth()+dir, 1); renderPayGrid(); renderDashboard(); }
+
+function renderPayGrid(){
+  const mk = monthKey(currentPayMonth);
+  document.getElementById('pay-month-label').textContent = formatMonth(currentPayMonth);
+  const grid = document.getElementById('pay-grid');
+  if(!members.length){ grid.innerHTML='<div class="empty"><div class="empty-icon">💰</div><p>A\'zo yo\'q</p></div>'; return; }
+  grid.innerHTML = members.map(m=>{
+    const isPaid = m.payments && m.payments[mk];
+    const debt = parseInt(m.debt)||0;
+    return `<div class="pay-card">
+      <div class="pay-card-head">
+        <div class="avatar">${initials(m.name,m.surname)}</div>
+        <div>
+          <div class="member-name">${m.name} ${m.surname||''}</div>
+          <div class="member-phone">${m.phone||'—'}</div>
+        </div>
+        <div style="margin-left:auto;">
+          ${isPaid?'<span class="badge badge-g">✓ To\'lagan</span>':'<span class="badge badge-r">✗ Kutilmoqda</span>'}
+        </div>
+      </div>
+      <div class="pay-card-body">
+        <div class="pay-month-row">
+          <div>
+            <div style="font-size:14px;font-weight:600;">${formatMonth(currentPayMonth)}</div>
+            <div style="font-size:12px;color:var(--muted);">${(settings.amount||500000).toLocaleString('uz-UZ')} so'm</div>
+          </div>
+          <button class="pay-toggle ${isPaid?'paid':'unpaid'}" onclick="togglePay('${m.id}','${mk}',${isPaid})"></button>
+        </div>
+        ${debt>0?`<div style="margin-top:10px;padding:8px 12px;background:rgba(232,84,84,.1);border-radius:var(--r-sm);font-size:12px;color:var(--red);">⚠️ Qarz: ${debt.toLocaleString('uz-UZ')} so'm</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function togglePay(id, mk, wasPaid){
+  const m = members.find(x=>x.id===id); if(!m) return;
+  const payments = m.payments||{};
+  if(wasPaid){ delete payments[mk]; }
+  else{ payments[mk]=true; }
+  let debt = parseInt(m.debt)||0;
+  if(!wasPaid && debt>0) debt = Math.max(0, debt-(settings.amount||500000));
+  try{
+    await apiPut(id, {...m, payments, debt});
+    await loadMembers();
+    toast(m.name+': '+(wasPaid?'To\'lov bekor qilindi':'To\'landi ✅'), wasPaid?'info':'success');
+  } catch(e){ toast(e.message,'error'); }
+}
+
+async function markAllPaid(){
+  if(!members.length) return;
+  const mk = monthKey(currentPayMonth);
+  if(!confirm('Barcha a\'zolarni '+formatMonth(currentPayMonth)+' uchun to\'landi deb belgilash?')) return;
+  try{
+    await Promise.all(members.map(m=>{
+      const payments = {...(m.payments||{}), [mk]:true};
+      return apiPut(m.id,{...m,payments});
+    }));
+    toast('Barchasi to\'landi deb belgilandi ✅','success');
+    await loadMembers();
+  } catch(e){ toast(e.message,'error'); }
+}
+
+/* ── SMS ── */
+const SMS_TEMPLATES = {
+  eslatma: ()=>`Hurmatli a'zo! 📅\n${settings.name||'Gap'} kuni ${settings.day}-sanada.\nSumma: ${(settings.amount||500000).toLocaleString('uz-UZ')} so'm.\nIltimos, o'z vaqtida to'lashingizni so'raymiz!\n\n— SBS tizimi`,
+  qarz: ()=>`Hurmatli a'zo! ⚠️\nGap bo'yicha qarzingiz mavjud.\nIltimos, tezroq to'lab, qarzdan xalos bo'ling.\n\n— SBS tizimi`,
+  yangi: ()=>`Assalomu alaykum! 🎉\nYangi gap boshlanmoqda!\nGap: ${settings.name||'Gap'}\nKun: Har oyning ${settings.day}-si\nSumma: ${(settings.amount||500000).toLocaleString('uz-UZ')} so'm\n\n— SBS tizimi`
+};
+function setSmsTemplate(key){ document.getElementById('sms-text').value = SMS_TEMPLATES[key](); }
+function renderSmsMembers(){
+  const mk = monthKey(new Date());
+  const list = document.getElementById('sms-member-list');
+  if(!members.length){ list.innerHTML='<div class="empty"><p>A\'zo yo\'q</p></div>'; return; }
+  list.innerHTML = members.map(m=>{
+    const isPaid = m.payments && m.payments[mk];
+    return `<div class="sms-member-item">
+      <input type="checkbox" class="chk" id="sms-chk-${m.id}" checked />
+      <div class="avatar" style="width:32px;height:32px;font-size:11px;">${initials(m.name,m.surname)}</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">${m.name} ${m.surname||''}</div>
+        <div style="font-size:12px;color:var(--muted);">${m.phone||'Raqam yo\'q'}</div>
+      </div>
+      ${isPaid?'<span class="badge badge-g" style="font-size:11px;">✓ To\'lagan</span>':'<span class="badge badge-r" style="font-size:11px;">To\'lamagan</span>'}
+    </div>`;
+  }).join('');
+}
+function selectAllSms(v){ members.forEach(m=>{ const c=document.getElementById('sms-chk-'+m.id); if(c) c.checked=v; }); }
+function selectUnpaidSms(){
+  const mk = monthKey(new Date());
+  members.forEach(m=>{ const c=document.getElementById('sms-chk-'+m.id); if(c) c.checked=!(m.payments&&m.payments[mk]); });
+}
+function sendSms(){
+  const text = document.getElementById('sms-text').value.trim();
+  if(!text){ toast('SMS matni bo\'sh!','error'); return; }
+  const selected = members.filter(m=>document.getElementById('sms-chk-'+m.id)?.checked && m.phone);
+  if(!selected.length){ toast('Hech kim tanlanmadi yoki raqam yo\'q!','error'); return; }
+  const log = {date:new Date().toLocaleString('uz-UZ'), text:text.substring(0,50)+'...', count:selected.length, numbers:selected.map(m=>m.phone)};
+  smsLog.unshift(log);
+  localStorage.setItem('sbs_sms_log',JSON.stringify(smsLog.slice(0,50)));
+  document.getElementById('sms-result-text').textContent = selected.length+' ta a\'zoga SMS yuborildi';
+  document.getElementById('sms-numbers-list').innerHTML = selected.map(m=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);">📱 ${m.name} ${m.surname||''} — ${m.phone}</div>`).join('');
+  openModal('modal-sms-result');
+  renderSmsLog();
+  /* Real SMS uchun Twilio/SMS.uz API integratsiyasi kerak */
+}
+function renderSmsLog(){
+  const log = JSON.parse(localStorage.getItem('sbs_sms_log')||'[]');
+  smsLog = log;
+  const wrap = document.getElementById('sms-log');
+  const list = document.getElementById('sms-log-list');
+  if(!log.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML = log.map(l=>`<div style="padding:12px;background:var(--em-mid);border-radius:var(--r-sm);margin-bottom:10px;font-size:13px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+      <span style="color:var(--gold-l);font-weight:600;">📤 ${l.count} ta raqam</span>
+      <span style="color:var(--muted);">${l.date}</span>
+    </div>
+    <div style="color:var(--muted);">${l.text}</div>
+  </div>`).join('');
+}
+
+/* ── API TEST ── */
+async function testApi(){
+  try{
+    const data = await apiGet();
+    toast('API ishlayapti! '+data.length+' ta yozuv','success');
+  } catch(e){ toast('API xatosi: '+e.message,'error'); }
+}
+async function clearAllData(){
+  if(!confirm('BARCHA ma\'lumotlar o\'chadi! Ishonchingiz komilmi?')) return;
+  if(!confirm('Oxirgi ogohlantirish! Davom etasizmi?')) return;
+  try{
+    const all = await apiGet();
+    await Promise.all(all.map(m=>apiDelete(m.id)));
+    toast('Barcha ma\'lumotlar o\'chirildi','info');
+    await loadMembers();
+  } catch(e){ toast(e.message,'error'); }
+}
+
+/* ── UI HELPERS ── */
+function initials(name,surname){ return ((name||'?')[0]+(surname?surname[0]:'')).toUpperCase(); }
+function showTab(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  event.currentTarget && event.currentTarget.classList.add('on');
+  if(id==='settings') applySettingsToForm();
+  if(id==='sms'){ renderSmsMembers(); renderSmsLog(); }
+  if(id==='payments') renderPayGrid();
+  if(id==='dashboard') renderDashboard();
+}
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+function toast(msg,type='info'){
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast-item '+type;
+  el.innerHTML = (type==='success'?'✅':type==='error'?'❌':'ℹ️')+' '+msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(100%)'; el.style.transition='.3s'; setTimeout(()=>el.remove(),300); }, 3500);
+}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('on'); }));
+
+/* ── INIT ── */
+loadSettings();
+setSmsTemplate('eslatma');
+loadMembers();
+</script>
+</body>
+</html>
